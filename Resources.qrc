@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/">
+        <file>QSS/style_files001.qss</file>
+        <file>QSS/style_files002.qss</file>
+        <file>QSS/style_files003.qss</file>
+        <file>config/default.ini</file>
+        <file>TS/language_ru.qm</file>
+        <file>ico/icoexit.ico</file>
+        <file>ico/icofolder.ico</file>
+        <file>ico/icoinfo.ico</file>
+        <file>ico/icosave.ico</file>
+        <file>ico/icosetting.ico</file>
+        <file>ico/icotraffic.ico</file>
+        <file>ico/icowrite.ico</file>
+        <file>ico/icoread.ico</file>
+    </qresource>
+</RCC>
