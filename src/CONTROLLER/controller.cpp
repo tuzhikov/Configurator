@@ -9,12 +9,15 @@
  */
 void Controller::commandWriteAll()
 {
-    commandSetTime();
-    commandSetSetting();
-    commandSetHolidays();
-    commandSetWeek();
-    commandSetPlans();
+    QQueue<QByteArray> cmd;
 
+    commandSetTime(cmd);
+    commandSetSetting(cmd);
+    commandSetHolidays(cmd);
+    commandSetWeek(cmd);
+    commandSetPlans(cmd);
+
+    sendMessage(cmd);
     qDebug()<<"command Write All";
 }
 
@@ -23,16 +26,19 @@ void Controller::commandWriteAll()
  */
 void Controller::commandReadAll()
 {
-    commandGetTime();
-    commandGetSetting();
-    commandGetHolidays();
-    commandGetWeek();
-    commandGetPlans();
+    QQueue<QByteArray> cmd;
 
+    commandGetTime(cmd);
+    commandGetSetting(cmd);
+    commandGetHolidays(cmd);
+    commandGetWeek(cmd);
+    commandGetPlans(cmd);
+
+    sendMessage(cmd);
     qDebug()<<"command Read All";
 }
 
-void Controller::commandForRead(TYPE_NUMBER_COMMAND subopcode, uint8_t index)
+void Controller::commandForRead(QQueue<QByteArray>& queue, TYPE_NUMBER_COMMAND subopcode, uint8_t index)
 {
     QByteArray cmd;
     cmd.append(static_cast<char>(6));           // lengh low
@@ -42,22 +48,23 @@ void Controller::commandForRead(TYPE_NUMBER_COMMAND subopcode, uint8_t index)
     cmd.append(static_cast<char>(subopcode));   // type cmd
     cmd.append(static_cast<char>(index));
     collectTransportLevel(cmd);
-    sendMessage(cmd);
+    //sendMessage(cmd);
+    queue.enqueue(cmd);
 }
 
 /**
  * @brief Controller::commandGetTime
  */
-void Controller::commandGetTime()
+void Controller::commandGetTime(QQueue<QByteArray>& queue)
 {
-    commandForRead(CMD_OPCODE_TIME);
+    commandForRead(queue, CMD_OPCODE_TIME);
     qDebug()<<"command Get Time";
 }
 
 /**
  * @brief Controller::commandSetTime
  */
-void Controller::commandSetTime()
+void Controller::commandSetTime(QQueue<QByteArray>& queue)
 {
     QByteArray cmd;
     cmd.append(sizeof(timeDevice)+6);// lengh time +crc(2) +cmd(4)
@@ -69,7 +76,8 @@ void Controller::commandSetTime()
     //fill in the data
     cmd.append((const char*)&timeDevice,sizeof(timeDevice)); //data
     collectTransportLevel(cmd);
-    sendMessage(cmd);
+    //sendMessage(cmd);
+    queue.enqueue(cmd);
     qDebug()<<"command Set Data: "<<timeDevice.year<<"."<<timeDevice.month<<"."<<timeDevice.day
            <<"Time: "<<timeDevice.hour<<":"<<timeDevice.min<<":"<<timeDevice.sec;
 }
@@ -77,14 +85,14 @@ void Controller::commandSetTime()
 /**
  * @brief Controller::commandGetPlans
  */
-void Controller::commandGetPlans()
+void Controller::commandGetPlans(QQueue<QByteArray>& queue)
 {
 
     const uint8_t max_plan = static_cast<uint8_t>(retDataProject().retDataProject().getMaxPlans());
 
     for (uint8_t i=0; i<max_plan;i++)
     {
-        commandForRead(CMD_OPCODE_DAY_PLANS,i);
+        commandForRead(queue, CMD_OPCODE_DAY_PLANS,i);
     }
     qDebug()<<"command Get Plans";
 }
@@ -92,7 +100,7 @@ void Controller::commandGetPlans()
 /**
  * @brief Controller::commandSetPlans
  */
-void Controller::commandSetPlans()
+void Controller::commandSetPlans(QQueue<QByteArray>& queue)
 {
     const uint8_t max_plan = static_cast<uint8_t>(retDataProject().retDataProject().getMaxPlans());
 
@@ -110,7 +118,8 @@ void Controller::commandSetPlans()
         collectTransportLevel(cmd);
         quint16 crc16 = CRC::Bit16( cmd );
         qDebug()<<crc16;
-        sendMessage(cmd);
+        //sendMessage(cmd);
+        queue.enqueue(cmd);
     }
 
     qDebug()<<"command Set Plans";
@@ -119,16 +128,16 @@ void Controller::commandSetPlans()
 /**
  * @brief Controller::commandGetWeek
  */
-void Controller::commandGetWeek()
+void Controller::commandGetWeek(QQueue<QByteArray>& queue)
 {
-    commandForRead(CMD_OPCODE_WEEK);
+    commandForRead(queue, CMD_OPCODE_WEEK);
     qDebug()<<"command Get Week";
 }
 
 /**
  * @brief Controller::commandSetWeek
  */
-void Controller::commandSetWeek()
+void Controller::commandSetWeek(QQueue<QByteArray>& queue)
 {
     QByteArray cmd;
     cmd.append(static_cast<char>(dataproject.retDataProject().getLengthDateWeek())+6);// lengh +crc(2) +cmd(4)
@@ -140,7 +149,8 @@ void Controller::commandSetWeek()
     //fill in the data
     cmd.append(dataproject.retDataProject().getDataWeek());
     collectTransportLevel(cmd);
-    sendMessage(cmd);
+    //sendMessage(cmd);
+    queue.enqueue(cmd);
 
     qDebug()<<"command Set Week:";
 }
@@ -148,16 +158,16 @@ void Controller::commandSetWeek()
 /**
  * @brief Controller::commandGetHolidays
  */
-void Controller::commandGetHolidays()
+void Controller::commandGetHolidays(QQueue<QByteArray>& queue)
 {
-    commandForRead(CMD_OPCODE_HOLIDAYS);
+    commandForRead(queue, CMD_OPCODE_HOLIDAYS);
     qDebug()<<"command Get Holidays";
 }
 
 /**
  * @brief Controller::commandSetHolidays
  */
-void Controller::commandSetHolidays()
+void Controller::commandSetHolidays(QQueue<QByteArray>& queue)
 {
     QByteArray cmd;
     cmd.append(static_cast<char>(dataproject.retDataProject().getLengthDateHoliday())+6);// lengh time +crc(2) +cmd(4)
@@ -169,24 +179,24 @@ void Controller::commandSetHolidays()
     //fill in the data
     cmd.append(dataproject.retDataProject().getDataHoliDay());
     collectTransportLevel(cmd);
-    sendMessage(cmd);
-
+    //sendMessage(cmd);
+    queue.enqueue(cmd);
     qDebug()<<"command Set Holiday";
 }
 
 /**
  * @brief Controller::commandGetSetting
  */
-void Controller::commandGetSetting()
+void Controller::commandGetSetting(QQueue<QByteArray>& queue)
 {
-    commandForRead(CMD_OPCODE_SETTINGS);
+    commandForRead(queue, CMD_OPCODE_SETTINGS);
     qDebug()<<"command Get Setting";
 }
 
 /**
  * @brief Controller::commandSetSetting
  */
-void Controller::commandSetSetting()
+void Controller::commandSetSetting(QQueue<QByteArray>& queue)
 {
     QByteArray cmd;
     cmd.append(static_cast<char>(dataproject.retDataProject().getLengthDateSetting())+6);// lengh time +crc(2) +cmd(4)
@@ -198,8 +208,8 @@ void Controller::commandSetSetting()
     //fill in the data
     cmd.append(dataproject.retDataProject().getDataSetting());
     collectTransportLevel(cmd);
-    sendMessage(cmd);
-
+    //sendMessage(cmd);
+    queue.enqueue(cmd);
     qDebug()<<"command Set setting";
 }
 
@@ -208,7 +218,8 @@ void Controller::commandSetSetting()
  */
 void Controller::commandGetStatus()
 {
-    commandForRead(CMD_OPCODE_STATUS);
+    QQueue<QByteArray> queue;
+    commandForRead(queue, CMD_OPCODE_STATUS);
     qDebug()<<"command commandGetStatus";
 }
 

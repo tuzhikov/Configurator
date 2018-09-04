@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
     a.installTranslator(&trn);
     //setting parametr
     QApplication::setOrganizationName("Software Ltd.");
-    QApplication::setApplicationName("Configurator");
+    QApplication::setApplicationName("Configurator     ");
     Controller controller;
     //create main windows
     MainWindow w(nullptr,&controller);

@@ -53,20 +53,20 @@ private:
     bool progressVisible;
 
     // send command
-    void commandForRead(TYPE_NUMBER_COMMAND subopcode, uint8_t index = 0);
+    void commandForRead(QQueue<QByteArray> &queue, TYPE_NUMBER_COMMAND subopcode, uint8_t index = 0);
     void commandWriteAll();
     void commandReadAll();
-    void commandSetTime();
-    void commandGetTime();
-    void commandGetPlans();
-    void commandSetPlans();
-    void commandGetWeek();
-    void commandSetWeek();
-    void commandGetHolidays();
-    void commandSetHolidays();
-    void commandGetSetting();
-    void commandSetSetting();
     void commandGetStatus();
+    void commandSetTime(QQueue<QByteArray>&);
+    void commandGetTime(QQueue<QByteArray>&);
+    void commandGetPlans(QQueue<QByteArray>&);
+    void commandSetPlans(QQueue<QByteArray>&);
+    void commandGetWeek(QQueue<QByteArray>&);
+    void commandSetWeek(QQueue<QByteArray>&);
+    void commandGetHolidays(QQueue<QByteArray>&);
+    void commandSetHolidays(QQueue<QByteArray>&);
+    void commandGetSetting(QQueue<QByteArray>&);
+    void commandSetSetting(QQueue<QByteArray>&);
 
     typedef void (Controller::*NUMBER_COMMAND)();
     const NUMBER_COMMAND command_send[END_TYPE_COMMAND] = {
