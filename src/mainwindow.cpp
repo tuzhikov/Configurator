@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent, Controller *pdata) :
     ui(new Ui::MainWindow),
     settings( new SettingsDialog(parent) ),
     statusBar(new QLabel(parent)),
+    progress(new QProgressBar(parent)),
     ptrController(pdata),
     date_time_make(__TIMESTAMP__),
     number_version("1.100")
@@ -188,14 +189,16 @@ void MainWindow::createToolBar()
  */
 void MainWindow::createStatusBar()
 {
-    /*Add progress in status bar*/
-    QProgressBar *progress = new QProgressBar(this);
+     /*Add progress in status bar*/
     progress->setVisible(false);
     progress->setTextVisible(true);
+    progress->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
+    // connect progressbar
     connect(ptrController,&Controller::signalProgressRange,progress,&QProgressBar::setRange,Qt::DirectConnection);
     connect(ptrController,&Controller::signalProgressValue,progress,&QProgressBar::setValue,Qt::DirectConnection);
     connect(ptrController,&Controller::signalProgressVisible,progress,&QProgressBar::setVisible,Qt::DirectConnection);
-    ui->statusBar->addPermanentWidget(progress,0);
+
+    ui->statusBar->addPermanentWidget(progress);
     /*Set message in status bar*/
     QLabel *p = new QLabel(this);
     p->setText(tr("Version:")+number_version);

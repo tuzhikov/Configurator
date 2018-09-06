@@ -48,7 +48,6 @@ void Controller::commandForRead(QQueue<QByteArray>& queue, TYPE_NUMBER_COMMAND s
     cmd.append(static_cast<char>(subopcode));   // type cmd
     cmd.append(static_cast<char>(index));
     collectTransportLevel(cmd);
-    //sendMessage(cmd);
     queue.enqueue(cmd);
 }
 
@@ -67,6 +66,7 @@ void Controller::commandGetTime(QQueue<QByteArray>& queue)
 void Controller::commandSetTime(QQueue<QByteArray>& queue)
 {
     QByteArray cmd;
+
     cmd.append(sizeof(timeDevice)+6);// lengh time +crc(2) +cmd(4)
     cmd.append(static_cast<char>(0));
     cmd.append(TYPE_TL);        // type
@@ -76,7 +76,6 @@ void Controller::commandSetTime(QQueue<QByteArray>& queue)
     //fill in the data
     cmd.append((const char*)&timeDevice,sizeof(timeDevice)); //data
     collectTransportLevel(cmd);
-    //sendMessage(cmd);
     queue.enqueue(cmd);
     qDebug()<<"command Set Data: "<<timeDevice.year<<"."<<timeDevice.month<<"."<<timeDevice.day
            <<"Time: "<<timeDevice.hour<<":"<<timeDevice.min<<":"<<timeDevice.sec;
@@ -116,9 +115,6 @@ void Controller::commandSetPlans(QQueue<QByteArray>& queue)
         //fill in the data
         cmd.append(dataproject.retDataProject().getDataOnePlan(0));
         collectTransportLevel(cmd);
-        quint16 crc16 = CRC::Bit16( cmd );
-        qDebug()<<crc16;
-        //sendMessage(cmd);
         queue.enqueue(cmd);
     }
 
@@ -149,7 +145,6 @@ void Controller::commandSetWeek(QQueue<QByteArray>& queue)
     //fill in the data
     cmd.append(dataproject.retDataProject().getDataWeek());
     collectTransportLevel(cmd);
-    //sendMessage(cmd);
     queue.enqueue(cmd);
 
     qDebug()<<"command Set Week:";
@@ -179,7 +174,6 @@ void Controller::commandSetHolidays(QQueue<QByteArray>& queue)
     //fill in the data
     cmd.append(dataproject.retDataProject().getDataHoliDay());
     collectTransportLevel(cmd);
-    //sendMessage(cmd);
     queue.enqueue(cmd);
     qDebug()<<"command Set Holiday";
 }
@@ -208,7 +202,6 @@ void Controller::commandSetSetting(QQueue<QByteArray>& queue)
     //fill in the data
     cmd.append(dataproject.retDataProject().getDataSetting());
     collectTransportLevel(cmd);
-    //sendMessage(cmd);
     queue.enqueue(cmd);
     qDebug()<<"command Set setting";
 }
@@ -220,6 +213,7 @@ void Controller::commandGetStatus()
 {
     QQueue<QByteArray> queue;
     commandForRead(queue, CMD_OPCODE_STATUS);
+    sendMessage(queue);
     qDebug()<<"command commandGetStatus";
 }
 

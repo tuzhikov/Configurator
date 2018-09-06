@@ -49,6 +49,7 @@ private:
     QStackedWidget *swPlans;
     SettingsDialog *settings;
     QLabel *statusBar;
+    QProgressBar *progress;
     Controller *ptrController;
     QTimer *timerTest;
     QTimer *timeUpdate;
